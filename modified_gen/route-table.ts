@@ -3,6 +3,7 @@
 
 import { Construct } from 'constructs';
 import * as cdktf from 'cdktf';
+import { TerraformStringAttribute, TerraformString } from '../tf_attributes/terraform-string-attributes';
 
 // Configuration
 
@@ -10,7 +11,7 @@ export interface RouteTableConfig extends cdktf.TerraformMetaArguments {
   readonly propagatingVgws?: string[];
   readonly route?: RouteTableRoute[];
   readonly tags?: { [key: string]: string };
-  readonly vpcId: string;
+  readonly vpcId: TerraformString;
 }
 export interface RouteTableRoute {
   readonly carrierGatewayId?: string;
@@ -70,7 +71,7 @@ export class RouteTable extends cdktf.TerraformResource {
     this._propagatingVgws = config.propagatingVgws;
     this._route = config.route;
     this._tags = config.tags;
-    this._vpcId = config.vpcId;
+    this.vpcId = config.vpcId;
   }
 
   // ==========
@@ -141,16 +142,17 @@ export class RouteTable extends cdktf.TerraformResource {
   }
 
   // vpc_id - computed: false, optional: false, required: true
-  private _vpcId: string;
-  public get vpcId() {
-    return this.getStringAttribute('vpc_id');
+  private _vpcId!: TerraformStringAttribute;
+  public get vpcId(): TerraformString {
+    return this._vpcId;
   }
-  public set vpcId(value: string) {
-    this._vpcId = value;
-  }
-  // Temporarily expose input value. Use with caution.
-  public get vpcIdInput() {
-    return this._vpcId
+  public set vpcId(value: TerraformString) {
+    if (typeof(value) === 'string') {
+      this._vpcId = new TerraformStringAttribute(this, 'vpc_id', value);
+    }
+    else {
+      this._vpcId = value;
+    }
   }
 
   // =========
@@ -162,7 +164,7 @@ export class RouteTable extends cdktf.TerraformResource {
       propagating_vgws: cdktf.listMapper(cdktf.stringToTerraform)(this._propagatingVgws),
       route: cdktf.listMapper(routeTableRouteToTerraform)(this._route),
       tags: cdktf.hashMapper(cdktf.anyToTerraform)(this._tags),
-      vpc_id: cdktf.stringToTerraform(this._vpcId),
+      vpc_id: this._vpcId.toTerraform(),
     };
   }
 }

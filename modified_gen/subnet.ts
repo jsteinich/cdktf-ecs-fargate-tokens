@@ -3,6 +3,7 @@
 
 import { Construct } from 'constructs';
 import * as cdktf from 'cdktf';
+import { TerraformString, TerraformStringAttribute } from '../tf_attributes/terraform-string-attributes';
 
 // Configuration
 
@@ -18,7 +19,7 @@ export interface SubnetConfig extends cdktf.TerraformMetaArguments {
   readonly outpostArn?: string;
   readonly tags?: { [key: string]: string };
   readonly tagsAll?: { [key: string]: string };
-  readonly vpcId: string;
+  readonly vpcId: TerraformString;
   /** timeouts block */
   readonly timeouts?: SubnetTimeouts;
 }
@@ -66,7 +67,7 @@ export class Subnet extends cdktf.TerraformResource {
     this._outpostArn = config.outpostArn;
     this._tags = config.tags;
     this._tagsAll = config.tagsAll;
-    this._vpcId = config.vpcId;
+    this.vpcId = config.vpcId;
     this._timeouts = config.timeouts;
   }
 
@@ -268,16 +269,17 @@ export class Subnet extends cdktf.TerraformResource {
   }
 
   // vpc_id - computed: false, optional: false, required: true
-  private _vpcId: string;
-  public get vpcId() {
-    return this.getStringAttribute('vpc_id');
+  private _vpcId!: TerraformStringAttribute;
+  public get vpcId(): TerraformString {
+    return this._vpcId;
   }
-  public set vpcId(value: string) {
-    this._vpcId = value;
-  }
-  // Temporarily expose input value. Use with caution.
-  public get vpcIdInput() {
-    return this._vpcId
+  public set vpcId(value: TerraformString) {
+    if (typeof(value) === 'string') {
+      this._vpcId = new TerraformStringAttribute(this, 'vpc_id', value);
+    }
+    else {
+      this._vpcId = value;
+    }
   }
 
   // timeouts - computed: false, optional: true, required: false
@@ -313,7 +315,7 @@ export class Subnet extends cdktf.TerraformResource {
       outpost_arn: cdktf.stringToTerraform(this._outpostArn),
       tags: cdktf.hashMapper(cdktf.anyToTerraform)(this._tags),
       tags_all: cdktf.hashMapper(cdktf.anyToTerraform)(this._tagsAll),
-      vpc_id: cdktf.stringToTerraform(this._vpcId),
+      vpc_id: this._vpcId.toTerraform(),
       timeouts: subnetTimeoutsToTerraform(this._timeouts),
     };
   }

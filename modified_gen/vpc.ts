@@ -3,6 +3,7 @@
 
 import { Construct } from 'constructs';
 import * as cdktf from 'cdktf';
+import { TerraformStringAttribute, TerraformString } from '../tf_attributes/terraform-string-attributes';
 
 // Configuration
 
@@ -21,6 +22,7 @@ export interface VpcConfig extends cdktf.TerraformMetaArguments {
 // Resource
 
 export class Vpc extends cdktf.TerraformResource {
+  public readonly id: TerraformString;
 
   // ===========
   // INITIALIZER
@@ -37,6 +39,7 @@ export class Vpc extends cdktf.TerraformResource {
       count: config.count,
       lifecycle: config.lifecycle
     });
+    this.id = new TerraformStringAttribute(this, 'id');
     this._assignGeneratedIpv6CidrBlock = config.assignGeneratedIpv6CidrBlock;
     this._cidrBlock = config.cidrBlock;
     this._enableClassiclink = config.enableClassiclink;
@@ -168,11 +171,6 @@ export class Vpc extends cdktf.TerraformResource {
   // Temporarily expose input value. Use with caution.
   public get enableDnsSupportInput() {
     return this._enableDnsSupport
-  }
-
-  // id - computed: true, optional: true, required: false
-  public get id() {
-    return this.getStringAttribute('id');
   }
 
   // instance_tenancy - computed: false, optional: true, required: false

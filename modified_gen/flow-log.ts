@@ -3,6 +3,7 @@
 
 import { Construct } from 'constructs';
 import * as cdktf from 'cdktf';
+import { TerraformString, TerraformStringAttribute } from '../tf_attributes/terraform-string-attributes';
 
 // Configuration
 
@@ -17,7 +18,7 @@ export interface FlowLogConfig extends cdktf.TerraformMetaArguments {
   readonly subnetId?: string;
   readonly tags?: { [key: string]: string };
   readonly trafficType: string;
-  readonly vpcId?: string;
+  readonly vpcId?: TerraformString;
 }
 
 // Resource
@@ -49,7 +50,7 @@ export class FlowLog extends cdktf.TerraformResource {
     this._subnetId = config.subnetId;
     this._tags = config.tags;
     this._trafficType = config.trafficType;
-    this._vpcId = config.vpcId;
+    this.vpcId = config.vpcId ?? new TerraformStringAttribute(this, 'vpc_id');
   }
 
   // ==========
@@ -224,19 +225,20 @@ export class FlowLog extends cdktf.TerraformResource {
   }
 
   // vpc_id - computed: false, optional: true, required: false
-  private _vpcId?: string;
-  public get vpcId() {
-    return this.getStringAttribute('vpc_id');
+  private _vpcId!: TerraformStringAttribute;
+  public get vpcId(): TerraformString {
+    return this._vpcId;
   }
-  public set vpcId(value: string ) {
-    this._vpcId = value;
+  public set vpcId(value: TerraformString) {
+    if (typeof(value) === 'string') {
+      this._vpcId = new TerraformStringAttribute(this, 'vpc_id', value);
+    }
+    else {
+      this._vpcId = value;
+    }
   }
   public resetVpcId() {
-    this._vpcId = undefined;
-  }
-  // Temporarily expose input value. Use with caution.
-  public get vpcIdInput() {
-    return this._vpcId
+    this._vpcId.value = undefined;
   }
 
   // =========
@@ -255,7 +257,7 @@ export class FlowLog extends cdktf.TerraformResource {
       subnet_id: cdktf.stringToTerraform(this._subnetId),
       tags: cdktf.hashMapper(cdktf.anyToTerraform)(this._tags),
       traffic_type: cdktf.stringToTerraform(this._trafficType),
-      vpc_id: cdktf.stringToTerraform(this._vpcId),
+      vpc_id: this._vpcId.toTerraform(),
     };
   }
 }
