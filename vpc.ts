@@ -11,7 +11,7 @@ import { CloudwatchLogGroup } from "./modified_gen/cloudwatch-log-group";
 import { IamRole } from "./modified_gen/iam-role";
 import { IamRolePolicy } from "./modified_gen/iam-role-policy";
 import { FlowLog } from "./modified_gen/flow-log";
-import { TerraformOutput } from "cdktf";
+import { TerraformOutputModified } from "./tf_attributes/terraform-output-modified";
 
 export interface VpcConstructConfig {
     name: string;
@@ -192,16 +192,17 @@ export class VpcConstruct extends Construct {
             vpcId: vpc.id
         });
 
-        new TerraformOutput(this, 'id', {
+        new TerraformOutputModified(this, 'id', {
             value: vpc.id
         });
 
-        new TerraformOutput(this, 'public_subnets', {
-            value: publicSubnets
-        });
+        //TODO figure out how to make this work. Probably by having runtime mapper know about terraform attributes
+        // new TerraformOutput(this, 'public_subnets', {
+        //     value: publicSubnets
+        // });
 
-        new TerraformOutput(this, 'private_subnets', {
-            value: privateSubnets
-        });
+        // new TerraformOutput(this, 'private_subnets', {
+        //     value: privateSubnets
+        // });
     }
 }

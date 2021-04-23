@@ -147,12 +147,7 @@ export class RouteTable extends cdktf.TerraformResource {
     return this._vpcId;
   }
   public set vpcId(value: TerraformString) {
-    if (typeof(value) === 'string') {
-      this._vpcId = new TerraformStringAttribute(this, 'vpc_id', value);
-    }
-    else {
-      this._vpcId = value;
-    }
+    this._vpcId = TerraformStringAttribute.Create(this, 'vpc_id', value);
   }
 
   // =========
