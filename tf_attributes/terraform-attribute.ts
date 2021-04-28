@@ -16,8 +16,9 @@ export abstract class TerraformAttribute {
             return this.nested.parent.interpolationForAttribute(this.terraformAttribute);
         }
         else {
-            //TODO let subclasses determine how to format this
-            return this.realValue;
+            return this.valueToTerraform();
         }
     }
+
+    protected abstract valueToTerraform(): any;
 }

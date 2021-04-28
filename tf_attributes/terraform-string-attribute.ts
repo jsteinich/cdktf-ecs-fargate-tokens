@@ -1,8 +1,9 @@
 import { TerraformAttribute } from "./terraform-attribute";
 import { TerraformInterpolable } from "./terraform-interpolable";
+import { stringToTerraform } from "cdktf";
 
 export class TerraformStringAttribute extends TerraformAttribute {
-    public constructor(parent: TerraformInterpolable, terraformAttribute: string, value?: string, nestedAttribute?: TerraformStringAttribute) {
+    public constructor(parent: TerraformInterpolable, terraformAttribute: string, value?: string, nestedAttribute?: TerraformAttribute) {
         super(parent, terraformAttribute, value, nestedAttribute);
     }
 
@@ -24,6 +25,10 @@ export class TerraformStringAttribute extends TerraformAttribute {
         else {
             return new TerraformStringAttribute(parent, terraformAttribute, value.value, value);
         }
+    }
+
+    protected valueToTerraform() {
+        return stringToTerraform(this.value);
     }
 }
 
