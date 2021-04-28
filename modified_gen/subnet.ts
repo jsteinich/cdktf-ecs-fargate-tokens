@@ -4,6 +4,9 @@
 import { Construct } from 'constructs';
 import * as cdktf from 'cdktf';
 import { TerraformString, TerraformStringAttribute } from '../tf_attributes/terraform-string-attributes';
+import { TerraformAttribute } from '../tf_attributes/terraform-attribute';
+import { TerraformInterpolable } from '../tf_attributes/terraform-interpolable';
+import { TerraformObjectAttribute } from '../tf_attributes/terraform-object-attribute';
 
 // Configuration
 
@@ -27,6 +30,44 @@ export interface SubnetTimeouts {
   readonly create?: string;
   readonly delete?: string;
 }
+
+// This isn't the best example since I'm not actually sure timeouts can be referenced (nor any reason to), but should be the same principal for any object type
+export class TerraformSubnetTimeoutsAttribute extends TerraformObjectAttribute {
+  public constructor(parent: TerraformInterpolable, terraformAttribute: string, value?: SubnetTimeouts, nestedAttribute?: TerraformAttribute) {
+    super(parent, terraformAttribute, value, nestedAttribute);
+  }
+
+  // I don't think we need to expose this since can get at everything in it
+  private get value(): SubnetTimeouts | undefined {
+    return this.realValue;
+  }
+
+  public static Create(parent: TerraformInterpolable, terraformAttribute: string, value: TerraformSubnetTimeouts) {
+    if (!(value instanceof TerraformSubnetTimeoutsAttribute)) {
+        return new TerraformSubnetTimeoutsAttribute(parent, terraformAttribute, value);
+    }
+    else if (value.parent === parent) {
+        return value;
+    }
+    else {
+        return new TerraformSubnetTimeoutsAttribute(parent, terraformAttribute, value.value, value);
+    }
+  }
+
+  protected valueToTerraform() {
+    return subnetTimeoutsToTerraform(this.realValue);
+  }
+
+  public get create(): TerraformStringAttribute {
+    return new TerraformStringAttribute(this, 'create', this.value?.create);
+  }
+
+  public get delete(): TerraformStringAttribute {
+    return new TerraformStringAttribute(this, 'delete', this.value?.delete);
+  }
+}
+
+export type TerraformSubnetTimeouts = SubnetTimeouts | TerraformSubnetTimeoutsAttribute;
 
 function subnetTimeoutsToTerraform(struct?: SubnetTimeouts): any {
   if (!cdktf.canInspect(struct)) { return struct; }
@@ -68,7 +109,7 @@ export class Subnet extends cdktf.TerraformResource {
     this._tags = config.tags;
     this._tagsAll = config.tagsAll;
     this.vpcId = config.vpcId;
-    this._timeouts = config.timeouts;
+    this.timeouts = config.timeouts ?? new TerraformSubnetTimeoutsAttribute(this, 'timeouts');
   }
 
   // ==========
@@ -278,19 +319,15 @@ export class Subnet extends cdktf.TerraformResource {
   }
 
   // timeouts - computed: false, optional: true, required: false
-  private _timeouts?: SubnetTimeouts;
+  private _timeouts!: TerraformSubnetTimeoutsAttribute;
   public get timeouts() {
-    return this.interpolationForAttribute('timeouts') as any;
+    return this._timeouts;
   }
-  public set timeouts(value: SubnetTimeouts ) {
-    this._timeouts = value;
+  public set timeouts(value: TerraformSubnetTimeouts) {
+    this._timeouts = TerraformSubnetTimeoutsAttribute.Create(this, 'timeouts', value);
   }
   public resetTimeouts() {
-    this._timeouts = undefined;
-  }
-  // Temporarily expose input value. Use with caution.
-  public get timeoutsInput() {
-    return this._timeouts
+    this._timeouts.reset();
   }
 
   // =========
@@ -311,7 +348,7 @@ export class Subnet extends cdktf.TerraformResource {
       tags: cdktf.hashMapper(cdktf.anyToTerraform)(this._tags),
       tags_all: cdktf.hashMapper(cdktf.anyToTerraform)(this._tagsAll),
       vpc_id: this._vpcId.toTerraform(),
-      timeouts: subnetTimeoutsToTerraform(this._timeouts),
+      timeouts: this._timeouts.toTerraform(),
     };
   }
 }
