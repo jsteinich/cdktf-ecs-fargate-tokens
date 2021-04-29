@@ -3,12 +3,13 @@
 
 import { Construct } from 'constructs';
 import * as cdktf from 'cdktf';
-import { TerraformStringAttribute, TerraformString } from '../tf_attributes/terraform-string-attributes';
+import { TerraformStringAttribute, TerraformString } from '../tf_attributes/terraform-string-attribute';
+import { TerraformStringListAttribute, TerraformStringList } from '../tf_attributes/terraform-string-list-attribute';
 
 // Configuration
 
 export interface RouteTableConfig extends cdktf.TerraformMetaArguments {
-  readonly propagatingVgws?: string[];
+  readonly propagatingVgws?: TerraformStringList;
   readonly route?: RouteTableRoute[];
   readonly tags?: { [key: string]: string };
   readonly vpcId: TerraformString;
@@ -68,7 +69,7 @@ export class RouteTable extends cdktf.TerraformResource {
       count: config.count,
       lifecycle: config.lifecycle
     });
-    this._propagatingVgws = config.propagatingVgws;
+    this.propagatingVgws = config.propagatingVgws ?? new TerraformStringListAttribute(this, 'propagating_vgws');
     this._route = config.route;
     this._tags = config.tags;
     this.vpcId = config.vpcId;
@@ -94,19 +95,15 @@ export class RouteTable extends cdktf.TerraformResource {
   }
 
   // propagating_vgws - computed: true, optional: true, required: false
-  private _propagatingVgws?: string[];
-  public get propagatingVgws() {
-    return this.getListAttribute('propagating_vgws');
+  private _propagatingVgws!: TerraformStringListAttribute;
+  public get propagatingVgws(): TerraformStringList {
+    return this._propagatingVgws;
   }
-  public set propagatingVgws(value: string[]) {
-    this._propagatingVgws = value;
+  public set propagatingVgws(value: TerraformStringList) {
+    this._propagatingVgws = TerraformStringListAttribute.Create(this, 'propagating_vgws', value);
   }
   public resetPropagatingVgws() {
-    this._propagatingVgws = undefined;
-  }
-  // Temporarily expose input value. Use with caution.
-  public get propagatingVgwsInput() {
-    return this._propagatingVgws
+    this._propagatingVgws.reset();
   }
 
   // route - computed: true, optional: true, required: false
@@ -156,7 +153,7 @@ export class RouteTable extends cdktf.TerraformResource {
 
   protected synthesizeAttributes(): { [name: string]: any } {
     return {
-      propagating_vgws: cdktf.listMapper(cdktf.stringToTerraform)(this._propagatingVgws),
+      propagating_vgws: this._propagatingVgws.toTerraform(),
       route: cdktf.listMapper(routeTableRouteToTerraform)(this._route),
       tags: cdktf.hashMapper(cdktf.anyToTerraform)(this._tags),
       vpc_id: this._vpcId.toTerraform(),

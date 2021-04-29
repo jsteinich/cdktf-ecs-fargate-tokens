@@ -3,7 +3,7 @@
 
 import { Construct } from 'constructs';
 import * as cdktf from 'cdktf';
-import { TerraformString, TerraformStringAttribute } from '../tf_attributes/terraform-string-attributes';
+import { TerraformString, TerraformStringAttribute } from '../tf_attributes/terraform-string-attribute';
 import { TerraformAttribute } from '../tf_attributes/terraform-attribute';
 import { TerraformInterpolable } from '../tf_attributes/terraform-interpolable';
 import { TerraformObjectAttribute } from '../tf_attributes/terraform-object-attribute';
