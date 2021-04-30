@@ -6,7 +6,7 @@ export abstract class TerraformListAttribute extends TerraformAttribute implemen
         super(parent, terraformAttribute, value, nestedAttribute);
     }
 
-    public interpolationForAttribute(_attribute: string | undefined): string {
-        return this.parent.interpolationForAttribute(this.terraformAttribute);
+    public interpolationForAttribute(attribute: string | undefined): string {
+        return this.parent.interpolationForAttribute(`${this.terraformAttribute}${attribute}`);
     }
 }

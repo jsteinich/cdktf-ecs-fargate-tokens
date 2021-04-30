@@ -19,7 +19,7 @@ export class TerraformOutputModified extends TerraformElement {
   constructor(scope: Construct, id: string, config: TerraformOutputConfig) {
     super(scope, id);
 
-    this.value = config.value instanceof TerraformAttribute ? config.value.toTerraform() : config.value;
+    this.value = config.value instanceof TerraformAttribute ? config.value.fqn : config.value;
     this.description = config.description;
     this.sensitive = config.sensitive;
     this.dependsOn = config.dependsOn;

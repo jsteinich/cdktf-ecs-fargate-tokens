@@ -12,6 +12,7 @@ import { IamRole } from "./modified_gen/iam-role";
 import { IamRolePolicy } from "./modified_gen/iam-role-policy";
 import { FlowLog } from "./modified_gen/flow-log";
 import { TerraformOutputModified } from "./tf_attributes/terraform-output-modified";
+import { TerraformStringListAttribute } from "./tf_attributes/terraform-string-list-attribute";
 
 export interface VpcConstructConfig {
     name: string;
@@ -47,12 +48,20 @@ export class VpcConstruct extends Construct {
         });
 
         const publicRouteTable = new RouteTable(this, "public-route-table", {
-            vpcId: vpc.id,
+            vpcId: igw.vpcId,
 
             tags: {
                 Name: `${config.name}-routing-table-public`,
                 Environment: config.environment
             }
+        });
+
+        new TerraformOutputModified(this, 'test-rt-list', {
+            value: publicRouteTable.propagatingVgws
+        });
+
+        new TerraformOutputModified(this, 'test-rt-list-elm', {
+            value: (publicRouteTable.propagatingVgws as TerraformStringListAttribute).get(0)
         });
 
         new Route(this, "public-route", {
@@ -77,7 +86,7 @@ export class VpcConstruct extends Construct {
             });
 
             const publicSubnet = new Subnet(this, `public-subnet-${index}`, {
-                vpcId: vpc.id,
+                vpcId: publicRouteTable.vpcId,
                 cidrBlock: config.publicSubnets[i],
                 availabilityZone: config.availabilityZones[i],
 
@@ -87,6 +96,10 @@ export class VpcConstruct extends Construct {
                 }
             });
             publicSubnets.push(publicSubnet);
+
+            new TerraformOutputModified(this, `test-subnet-obj-${index}`, {
+                value: publicSubnet.timeouts.create
+            });
 
             const privateSubnet = new Subnet(this, `private-subnet-${index}`, {
                 vpcId: vpc.id,

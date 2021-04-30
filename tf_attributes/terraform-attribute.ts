@@ -20,5 +20,9 @@ export abstract class TerraformAttribute {
         }
     }
 
+    public get fqn(): string {
+        return this.parent.interpolationForAttribute(this.terraformAttribute);
+    }
+
     protected abstract valueToTerraform(): any;
 }
