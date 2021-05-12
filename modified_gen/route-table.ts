@@ -69,10 +69,10 @@ export class RouteTable extends cdktf.TerraformResource {
       count: config.count,
       lifecycle: config.lifecycle
     });
-    this.propagatingVgws = config.propagatingVgws ?? new TerraformStringListAttribute(this, 'propagating_vgws');
+    this.putPropagatingVgws(config.propagatingVgws ?? new TerraformStringListAttribute(this, 'propagating_vgws'));
     this._route = config.route;
     this._tags = config.tags;
-    this.vpcId = config.vpcId;
+    this.putVpcId(config.vpcId);
   }
 
   // ==========
@@ -96,14 +96,16 @@ export class RouteTable extends cdktf.TerraformResource {
 
   // propagating_vgws - computed: true, optional: true, required: false
   private _propagatingVgws!: TerraformStringListAttribute;
-  public get propagatingVgws(): TerraformStringList {
+  public get propagatingVgws(): TerraformStringListAttribute {
     return this._propagatingVgws;
   }
-  public set propagatingVgws(value: TerraformStringList) {
-    this._propagatingVgws = TerraformStringListAttribute.Create(this, 'propagating_vgws', value);
-  }
-  public resetPropagatingVgws() {
-    this._propagatingVgws.reset();
+  public putPropagatingVgws(value: TerraformStringList | undefined) {
+    if(value === undefined) {
+      this._propagatingVgws.reset();
+    }
+    else {
+      this._propagatingVgws = TerraformStringListAttribute.Create(this, 'propagating_vgws', value);
+    }
   }
 
   // route - computed: true, optional: true, required: false
@@ -140,10 +142,10 @@ export class RouteTable extends cdktf.TerraformResource {
 
   // vpc_id - computed: false, optional: false, required: true
   private _vpcId!: TerraformStringAttribute;
-  public get vpcId(): TerraformString {
+  public get vpcId(): TerraformStringAttribute {
     return this._vpcId;
   }
-  public set vpcId(value: TerraformString) {
+  public putVpcId(value: TerraformString) {
     this._vpcId = TerraformStringAttribute.Create(this, 'vpc_id', value);
   }
 

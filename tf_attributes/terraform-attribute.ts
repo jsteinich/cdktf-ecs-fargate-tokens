@@ -21,6 +21,10 @@ export abstract class TerraformAttribute {
     }
 
     public get fqn(): string {
+        return `${this.parent.fqn}.${this.terraformAttribute}`;
+    }
+
+    public get terraformReference(): string {
         return this.parent.interpolationForAttribute(this.terraformAttribute);
     }
 

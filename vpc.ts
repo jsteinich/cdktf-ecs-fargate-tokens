@@ -12,7 +12,6 @@ import { IamRole } from "./modified_gen/iam-role";
 import { IamRolePolicy } from "./modified_gen/iam-role-policy";
 import { FlowLog } from "./modified_gen/flow-log";
 import { TerraformOutputModified } from "./tf_attributes/terraform-output-modified";
-import { TerraformStringListAttribute } from "./tf_attributes/terraform-string-list-attribute";
 
 export interface VpcConstructConfig {
     name: string;
@@ -61,7 +60,7 @@ export class VpcConstruct extends Construct {
         });
 
         new TerraformOutputModified(this, 'test-rt-list-elm', {
-            value: (publicRouteTable.propagatingVgws as TerraformStringListAttribute).get(0)
+            value: publicRouteTable.propagatingVgws.get(0)
         });
 
         new Route(this, "public-route", {

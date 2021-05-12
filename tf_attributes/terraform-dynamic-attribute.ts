@@ -11,10 +11,6 @@ export class TerraformDynamicAttribute extends TerraformAttribute {
         return this.realValue;
     }
 
-    public set value(val: { [key: string]: any } | undefined) {
-        this.realValue = val;
-    }
-
     public static Create(parent: TerraformInterpolable, terraformAttribute: string, value: TerraformDynamic) {
         if (!(value instanceof TerraformDynamicAttribute)) {
             return new TerraformDynamicAttribute(parent, terraformAttribute, value);

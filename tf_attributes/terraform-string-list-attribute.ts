@@ -13,10 +13,6 @@ export class TerraformStringListAttribute extends TerraformListAttribute {
         return this.realValue;
     }
 
-    public set value(val: TerraformString[] | undefined) {
-        this.realValue = val;
-    }
-
     public get(index: number): TerraformStringAttribute {
         return new TerraformStringAttribute(this, `[${index}]`);
     }

@@ -32,7 +32,7 @@ export class InternetGateway extends cdktf.TerraformResource {
       lifecycle: config.lifecycle
     });
     this._tags = config.tags;
-    this.vpcId = config.vpcId ?? new TerraformStringAttribute(this, 'vpc_id');
+    this.putVpcId(config.vpcId ?? new TerraformStringAttribute(this, 'vpc_id'));
   }
 
   // ==========
@@ -72,14 +72,16 @@ export class InternetGateway extends cdktf.TerraformResource {
 
   // vpc_id - computed: false, optional: true, required: false
   private _vpcId!: TerraformStringAttribute;
-  public get vpcId(): TerraformString {
+  public get vpcId(): TerraformStringAttribute {
     return this._vpcId;
   }
-  public set vpcId(value: TerraformString) {
-    this._vpcId = TerraformStringAttribute.Create(this, 'vpc_id', value);
-  }
-  public resetVpcId() {
-    this._vpcId.reset();
+  public putVpcId(value: TerraformString | undefined) {
+    if(value === undefined){
+      this._vpcId.reset();
+    }
+    else {
+      this._vpcId = TerraformStringAttribute.Create(this, 'vpc_id', value);
+    }
   }
 
   // =========

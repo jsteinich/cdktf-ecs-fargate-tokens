@@ -3,7 +3,7 @@
 
 import { Construct } from 'constructs';
 import * as cdktf from 'cdktf';
-import { TerraformStringAttribute, TerraformString } from '../tf_attributes/terraform-string-attribute';
+import { TerraformStringAttribute } from '../tf_attributes/terraform-string-attribute';
 
 // Configuration
 
@@ -22,7 +22,7 @@ export interface VpcConfig extends cdktf.TerraformMetaArguments {
 // Resource
 
 export class Vpc extends cdktf.TerraformResource {
-  public readonly id: TerraformString;
+  public readonly id: TerraformStringAttribute;
 
   // ===========
   // INITIALIZER

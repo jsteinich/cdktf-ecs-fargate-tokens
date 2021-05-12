@@ -11,10 +11,6 @@ export class TerraformStringAttribute extends TerraformAttribute {
         return this.realValue;
     }
 
-    public set value(val: string | undefined) {
-        this.realValue = val;
-    }
-
     public static Create(parent: TerraformInterpolable, terraformAttribute: string, value: TerraformString) {
         if (typeof(value) === 'string') {
             return new TerraformStringAttribute(parent, terraformAttribute, value);

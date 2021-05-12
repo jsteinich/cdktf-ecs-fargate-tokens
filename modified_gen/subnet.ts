@@ -108,8 +108,8 @@ export class Subnet extends cdktf.TerraformResource {
     this._outpostArn = config.outpostArn;
     this._tags = config.tags;
     this._tagsAll = config.tagsAll;
-    this.vpcId = config.vpcId;
-    this.timeouts = config.timeouts ?? new TerraformSubnetTimeoutsAttribute(this, 'timeouts');
+    this.putVpcId(config.vpcId);
+    this.putTimeouts(config.timeouts ?? new TerraformSubnetTimeoutsAttribute(this, 'timeouts'));
   }
 
   // ==========
@@ -311,10 +311,10 @@ export class Subnet extends cdktf.TerraformResource {
 
   // vpc_id - computed: false, optional: false, required: true
   private _vpcId!: TerraformStringAttribute;
-  public get vpcId(): TerraformString {
+  public get vpcId(): TerraformStringAttribute {
     return this._vpcId;
   }
-  public set vpcId(value: TerraformString) {
+  public putVpcId(value: TerraformString) {
     this._vpcId = TerraformStringAttribute.Create(this, 'vpc_id', value);
   }
 
@@ -323,11 +323,13 @@ export class Subnet extends cdktf.TerraformResource {
   public get timeouts() {
     return this._timeouts;
   }
-  public set timeouts(value: TerraformSubnetTimeouts) {
-    this._timeouts = TerraformSubnetTimeoutsAttribute.Create(this, 'timeouts', value);
-  }
-  public resetTimeouts() {
-    this._timeouts.reset();
+  public putTimeouts(value: TerraformSubnetTimeouts | undefined) {
+    if(value === undefined){
+      this._timeouts.reset();
+    }
+    else {
+      this._timeouts = TerraformSubnetTimeoutsAttribute.Create(this, 'timeouts', value);
+    }
   }
 
   // =========
