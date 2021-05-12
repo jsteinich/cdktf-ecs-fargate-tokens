@@ -63,6 +63,18 @@ export class VpcConstruct extends Construct {
             value: publicRouteTable.propagatingVgws.get(0)
         });
 
+        new TerraformOutputModified(this, 'test-rt-route-list', {
+            value: publicRouteTable.route
+        });
+
+        new TerraformOutputModified(this, 'test-rt-route-list-elm', {
+            value: publicRouteTable.route.get(0)
+        });
+
+        new TerraformOutputModified(this, 'test-rt-route-list-elm-prop', {
+            value: publicRouteTable.route.get(0).cidrBlock
+        });
+
         new Route(this, "public-route", {
             routeTableId: publicRouteTable.id,
             destinationCidrBlock: "0.0.0.0/0",

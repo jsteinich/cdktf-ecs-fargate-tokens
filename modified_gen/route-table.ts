@@ -5,12 +5,17 @@ import { Construct } from 'constructs';
 import * as cdktf from 'cdktf';
 import { TerraformStringAttribute, TerraformString } from '../tf_attributes/terraform-string-attribute';
 import { TerraformStringListAttribute, TerraformStringList } from '../tf_attributes/terraform-string-list-attribute';
+import { TerraformListAttribute } from '../tf_attributes/terraform-list-attribute';
+import { TerraformInterpolable } from '../tf_attributes/terraform-interpolable';
+import { TerraformAttribute } from '../tf_attributes/terraform-attribute';
+import { TerraformObjectAttribute } from '../tf_attributes/terraform-object-attribute';
+import { listMapper } from 'cdktf';
 
 // Configuration
 
 export interface RouteTableConfig extends cdktf.TerraformMetaArguments {
   readonly propagatingVgws?: TerraformStringList;
-  readonly route?: RouteTableRoute[];
+  readonly route?: TerraformRouteTableRouteList;
   readonly tags?: { [key: string]: string };
   readonly vpcId: TerraformString;
 }
@@ -30,6 +35,45 @@ export interface RouteTableRoute {
   readonly vpcPeeringConnectionId?: string;
 }
 
+export class TerraformRouteTableRouteAttribute extends TerraformObjectAttribute {
+  public constructor(parent: TerraformInterpolable, terraformAttribute: string, value?: RouteTableRoute, nestedAttribute?: TerraformAttribute) {
+    super(parent, terraformAttribute, value, nestedAttribute);
+  }
+
+  // I don't think we need to expose this since can get at everything in it
+  private get value(): RouteTableRoute | undefined {
+    return this.realValue;
+  }
+
+  public static Create(parent: TerraformInterpolable, terraformAttribute: string, value: TerraformRouteTableRoute) {
+    if (!(value instanceof TerraformRouteTableRouteAttribute)) {
+        return new TerraformRouteTableRouteAttribute(parent, terraformAttribute, value);
+    }
+    else if (value.parent === parent) {
+        return value;
+    }
+    else {
+        return new TerraformRouteTableRouteAttribute(parent, terraformAttribute, value.value, value);
+    }
+  }
+
+  protected valueToTerraform() {
+    return routeTableRouteToTerraform(this.realValue);
+  }
+
+  public get carrierGatewayId(): TerraformStringAttribute {
+    return new TerraformStringAttribute(this, 'carrier_gateway_id', this.value?.carrierGatewayId);
+  }
+
+  public get cidrBlock(): TerraformStringAttribute {
+    return new TerraformStringAttribute(this, 'cidr_block', this.value?.cidrBlock);
+  }
+  
+  //...
+}
+
+export type TerraformRouteTableRoute = RouteTableRoute | TerraformRouteTableRouteAttribute;
+
 function routeTableRouteToTerraform(struct?: RouteTableRoute): any {
   if (!cdktf.canInspect(struct)) { return struct; }
   return {
@@ -48,6 +92,38 @@ function routeTableRouteToTerraform(struct?: RouteTableRoute): any {
     vpc_peering_connection_id: struct!.vpcPeeringConnectionId === undefined ? null : cdktf.stringToTerraform(struct!.vpcPeeringConnectionId),
   }
 }
+
+export class TerraformRouteTableRouteListAttribute extends TerraformListAttribute {
+  public constructor(parent: TerraformInterpolable, terraformAttribute: string, value?: TerraformRouteTableRoute[], nestedAttribute?: TerraformAttribute) {
+    super(parent, terraformAttribute, value, nestedAttribute);
+  }
+
+  public get value(): TerraformRouteTableRoute[] | undefined {
+    return this.realValue;
+  }
+
+  public get(index: number): TerraformRouteTableRouteAttribute {
+    return new TerraformRouteTableRouteAttribute(this, `[${index}]`);
+}
+
+  public static Create(parent: TerraformInterpolable, terraformAttribute: string, value: TerraformRouteTableRouteList) {
+    if (!(value instanceof TerraformRouteTableRouteListAttribute)) {
+        return new TerraformRouteTableRouteListAttribute(parent, terraformAttribute, value);
+    }
+    else if (value.parent === parent) {
+        return value;
+    }
+    else {
+        return new TerraformRouteTableRouteListAttribute(parent, terraformAttribute, value.value, value);
+    }
+  }
+
+  protected valueToTerraform() {
+    return listMapper(routeTableRouteToTerraform)(this.realValue);
+  }
+}
+
+export type TerraformRouteTableRouteList = TerraformRouteTableRoute[] | TerraformRouteTableRouteListAttribute;
 
 
 // Resource
@@ -70,7 +146,7 @@ export class RouteTable extends cdktf.TerraformResource {
       lifecycle: config.lifecycle
     });
     this.putPropagatingVgws(config.propagatingVgws ?? new TerraformStringListAttribute(this, 'propagating_vgws'));
-    this._route = config.route;
+    this.putRoute(config.route ?? new TerraformRouteTableRouteListAttribute(this, 'route'));
     this._tags = config.tags;
     this.putVpcId(config.vpcId);
   }
@@ -109,19 +185,17 @@ export class RouteTable extends cdktf.TerraformResource {
   }
 
   // route - computed: true, optional: true, required: false
-  private _route?: RouteTableRoute[]
-  public get route(): RouteTableRoute[] {
-    return this.interpolationForAttribute('route') as any; // Getting the computed value is not yet implemented
+  private _route!: TerraformRouteTableRouteListAttribute
+  public get route(): TerraformRouteTableRouteListAttribute {
+    return this._route;
   }
-  public set route(value: RouteTableRoute[]) {
-    this._route = value;
-  }
-  public resetRoute() {
-    this._route = undefined;
-  }
-  // Temporarily expose input value. Use with caution.
-  public get routeInput() {
-    return this._route
+  public putRoute(value: TerraformRouteTableRouteList | undefined) {
+    if(value === undefined) {
+      this._route.reset();
+    }
+    else {
+      this._route = TerraformRouteTableRouteListAttribute.Create(this, 'route', value);
+    }
   }
 
   // tags - computed: false, optional: true, required: false
@@ -156,7 +230,7 @@ export class RouteTable extends cdktf.TerraformResource {
   protected synthesizeAttributes(): { [name: string]: any } {
     return {
       propagating_vgws: this._propagatingVgws.toTerraform(),
-      route: cdktf.listMapper(routeTableRouteToTerraform)(this._route),
+      route: this._route.toTerraform(),
       tags: cdktf.hashMapper(cdktf.anyToTerraform)(this._tags),
       vpc_id: this._vpcId.toTerraform(),
     };
