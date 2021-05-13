@@ -10,13 +10,14 @@ import { TerraformInterpolable } from '../tf_attributes/terraform-interpolable';
 import { TerraformAttribute } from '../tf_attributes/terraform-attribute';
 import { TerraformObjectAttribute } from '../tf_attributes/terraform-object-attribute';
 import { listMapper } from 'cdktf';
+import { TerraformStringMap, TerraformStringMapAttribute } from '../tf_attributes/terraform-string-map-attribute';
 
 // Configuration
 
 export interface RouteTableConfig extends cdktf.TerraformMetaArguments {
   readonly propagatingVgws?: TerraformStringList;
   readonly route?: TerraformRouteTableRouteList;
-  readonly tags?: { [key: string]: string };
+  readonly tags?: TerraformStringMap;
   readonly vpcId: TerraformString;
 }
 export interface RouteTableRoute {
@@ -147,7 +148,7 @@ export class RouteTable extends cdktf.TerraformResource {
     });
     this.putPropagatingVgws(config.propagatingVgws ?? new TerraformStringListAttribute(this, 'propagating_vgws'));
     this.putRoute(config.route ?? new TerraformRouteTableRouteListAttribute(this, 'route'));
-    this._tags = config.tags;
+    this.putTags(config.tags ?? new TerraformStringMapAttribute(this, 'tags'));
     this.putVpcId(config.vpcId);
   }
 
@@ -199,19 +200,17 @@ export class RouteTable extends cdktf.TerraformResource {
   }
 
   // tags - computed: false, optional: true, required: false
-  private _tags?: { [key: string]: string };
-  public get tags() {
-    return this.interpolationForAttribute('tags') as any;
+  private _tags!: TerraformStringMapAttribute
+  public get tags(): TerraformStringMapAttribute {
+    return this._tags;
   }
-  public set tags(value: { [key: string]: string } ) {
-    this._tags = value;
-  }
-  public resetTags() {
-    this._tags = undefined;
-  }
-  // Temporarily expose input value. Use with caution.
-  public get tagsInput() {
-    return this._tags
+  public putTags(value: TerraformStringMap | undefined){
+    if(value === undefined) {
+      this._tags.reset();
+    }
+    else {
+      this._tags = TerraformStringMapAttribute.Create(this, 'tags', value);
+    }
   }
 
   // vpc_id - computed: false, optional: false, required: true
@@ -231,7 +230,7 @@ export class RouteTable extends cdktf.TerraformResource {
     return {
       propagating_vgws: this._propagatingVgws.toTerraform(),
       route: this._route.toTerraform(),
-      tags: cdktf.hashMapper(cdktf.anyToTerraform)(this._tags),
+      tags: this._tags.toTerraform(),
       vpc_id: this._vpcId.toTerraform(),
     };
   }
