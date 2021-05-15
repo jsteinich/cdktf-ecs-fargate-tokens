@@ -1,16 +1,21 @@
 import { TerraformSetAttribute } from "./terraform-set-attribute";
-import { TerraformAttribute } from "./terraform-attribute";
+import { TerraformAttributeOptions } from "./terraform-attribute";
 import { listMapper, anyToTerraform } from "cdktf";
 import { TerraformAny } from "./terraform-any-attribute";
 import { ITerraformAddressable } from "./terraform-addressable";
+import { TerraformAnyListAttribute } from "./terraform-any-list-attribute";
 
 export class TerraformAnySetAttribute extends TerraformSetAttribute {
-    public constructor(parent: ITerraformAddressable, terraformAttribute: string, value?: TerraformAny[] /* Set<T> isn't supported by jsii */, nestedAttribute?: TerraformAttribute) {
-        super(parent, terraformAttribute, value, nestedAttribute);
+    public constructor(parent: ITerraformAddressable, terraformAttribute: string, value?: TerraformAny[] /* Set<T> isn't supported by jsii */, options?: TerraformAttributeOptions) {
+        super(parent, terraformAttribute, value, options);
     }
 
     public get value(): TerraformAny[] /* Set<T> isn't supported by jsii */ | undefined {
         return this.realValue;
+    }
+
+    public toList(): TerraformAnyListAttribute {
+        return new TerraformAnyListAttribute(this.parent, this.terraformAttribute, this.value, { nested: this.nested, operation: fqn => `tolist(${fqn})` });
     }
 
     public static Create(parent: ITerraformAddressable, terraformAttribute: string, value: TerraformAnySet) {
@@ -21,7 +26,7 @@ export class TerraformAnySetAttribute extends TerraformSetAttribute {
             return value;
         }
         else {
-            return new TerraformAnySetAttribute(parent, terraformAttribute, value.value, value);
+            return new TerraformAnySetAttribute(parent, terraformAttribute, value.value, { nested: value });
         }
     }
 

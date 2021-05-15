@@ -4,7 +4,7 @@
 import { Construct } from 'constructs';
 import * as cdktf from 'cdktf';
 import { TerraformString, TerraformStringAttribute } from '../tf_attributes/terraform-string-attribute';
-import { TerraformAttribute } from '../tf_attributes/terraform-attribute';
+import { TerraformAttributeOptions } from '../tf_attributes/terraform-attribute';
 import { TerraformObjectAttribute } from '../tf_attributes/terraform-object-attribute';
 import { ITerraformAddressable } from '../tf_attributes/terraform-addressable';
 
@@ -33,8 +33,8 @@ export interface SubnetTimeouts {
 
 // This isn't the best example since I'm not actually sure timeouts can be referenced (nor any reason to), but should be the same principal for any object type
 export class TerraformSubnetTimeoutsAttribute extends TerraformObjectAttribute {
-  public constructor(parent: ITerraformAddressable, terraformAttribute: string, value?: SubnetTimeouts, nestedAttribute?: TerraformAttribute) {
-    super(parent, terraformAttribute, value, nestedAttribute);
+  public constructor(parent: ITerraformAddressable, terraformAttribute: string, value?: SubnetTimeouts, options?: TerraformAttributeOptions) {
+    super(parent, terraformAttribute, value, options);
   }
 
   // I don't think we need to expose this since can get at everything in it
@@ -50,7 +50,7 @@ export class TerraformSubnetTimeoutsAttribute extends TerraformObjectAttribute {
         return value;
     }
     else {
-        return new TerraformSubnetTimeoutsAttribute(parent, terraformAttribute, value.value, value);
+        return new TerraformSubnetTimeoutsAttribute(parent, terraformAttribute, value.value, { nested: value });
     }
   }
 

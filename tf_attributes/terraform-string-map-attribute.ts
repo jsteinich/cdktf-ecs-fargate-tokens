@@ -1,12 +1,12 @@
-import { TerraformAttribute } from "./terraform-attribute";
+import { TerraformAttributeOptions } from "./terraform-attribute";
 import { hashMapper, stringToTerraform } from "cdktf";
 import { TerraformMapAttribute } from "./terraform-map-attribute";
 import { TerraformString, TerraformStringAttribute } from "./terraform-string-attribute";
 import { ITerraformAddressable } from "./terraform-addressable";
 
 export class TerraformStringMapAttribute extends TerraformMapAttribute {
-    public constructor(parent: ITerraformAddressable, terraformAttribute: string, value?: { [key: string]: TerraformString }, nestedAttribute?: TerraformAttribute) {
-        super(parent, terraformAttribute, value, nestedAttribute);
+    public constructor(parent: ITerraformAddressable, terraformAttribute: string, value?: { [key: string]: TerraformString }, options?: TerraformAttributeOptions) {
+        super(parent, terraformAttribute, value, options);
     }
 
     public get value(): { [key: string]: TerraformString } | undefined {
@@ -25,7 +25,7 @@ export class TerraformStringMapAttribute extends TerraformMapAttribute {
             return value;
         }
         else {
-            return new TerraformStringMapAttribute(parent, terraformAttribute, value.value, value);
+            return new TerraformStringMapAttribute(parent, terraformAttribute, value.value, { nested: value });
         }
     }
 

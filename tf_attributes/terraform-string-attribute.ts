@@ -1,10 +1,10 @@
-import { TerraformAttribute } from "./terraform-attribute";
+import { TerraformAttribute, TerraformAttributeOptions } from "./terraform-attribute";
 import { stringToTerraform } from "cdktf";
 import { ITerraformAddressable } from "./terraform-addressable";
 
 export class TerraformStringAttribute extends TerraformAttribute {
-    public constructor(parent: ITerraformAddressable, terraformAttribute: string, value?: string, nestedAttribute?: TerraformAttribute) {
-        super(parent, terraformAttribute, value, nestedAttribute);
+    public constructor(parent: ITerraformAddressable, terraformAttribute: string, value?: string, options?: TerraformAttributeOptions) {
+        super(parent, terraformAttribute, value, options);
     }
 
     public get value(): string | undefined {
@@ -19,7 +19,7 @@ export class TerraformStringAttribute extends TerraformAttribute {
             return value;
         }
         else {
-            return new TerraformStringAttribute(parent, terraformAttribute, value.value, value);
+            return new TerraformStringAttribute(parent, terraformAttribute, value.value, { nested: value });
         }
     }
 

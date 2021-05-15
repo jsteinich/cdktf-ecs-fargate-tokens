@@ -1,12 +1,12 @@
 import { TerraformListAttribute } from "./terraform-list-attribute";
-import { TerraformAttribute } from "./terraform-attribute";
+import { TerraformAttributeOptions } from "./terraform-attribute";
 import { listMapper, stringToTerraform } from "cdktf";
 import { TerraformString, TerraformStringAttribute } from "./terraform-string-attribute";
 import { ITerraformAddressable } from "./terraform-addressable";
 
 export class TerraformStringListAttribute extends TerraformListAttribute {
-    public constructor(parent: ITerraformAddressable, terraformAttribute: string, value?: TerraformString[], nestedAttribute?: TerraformAttribute) {
-        super(parent, terraformAttribute, value, nestedAttribute);
+    public constructor(parent: ITerraformAddressable, terraformAttribute: string, value?: TerraformString[], options?: TerraformAttributeOptions) {
+        super(parent, terraformAttribute, value, options);
     }
 
     public get value(): TerraformString[] | undefined {
@@ -25,7 +25,7 @@ export class TerraformStringListAttribute extends TerraformListAttribute {
             return value;
         }
         else {
-            return new TerraformStringListAttribute(parent, terraformAttribute, value.value, value);
+            return new TerraformStringListAttribute(parent, terraformAttribute, value.value, { nested: value });
         }
     }
 

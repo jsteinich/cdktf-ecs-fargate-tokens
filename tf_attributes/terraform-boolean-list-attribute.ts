@@ -1,12 +1,12 @@
 import { TerraformListAttribute } from "./terraform-list-attribute";
-import { TerraformAttribute } from "./terraform-attribute";
+import { TerraformAttributeOptions } from "./terraform-attribute";
 import { listMapper, booleanToTerraform } from "cdktf";
 import { TerraformBoolean, TerraformBooleanAttribute } from "./terraform-boolean-attribute";
 import { ITerraformAddressable } from "./terraform-addressable";
 
 export class TerraformBooleanListAttribute extends TerraformListAttribute {
-    public constructor(parent: ITerraformAddressable, terraformAttribute: string, value?: TerraformBoolean[], nestedAttribute?: TerraformAttribute) {
-        super(parent, terraformAttribute, value, nestedAttribute);
+    public constructor(parent: ITerraformAddressable, terraformAttribute: string, value?: TerraformBoolean[], options?: TerraformAttributeOptions) {
+        super(parent, terraformAttribute, value, options);
     }
 
     public get value(): TerraformBoolean[] | undefined {
@@ -25,7 +25,7 @@ export class TerraformBooleanListAttribute extends TerraformListAttribute {
             return value;
         }
         else {
-            return new TerraformBooleanListAttribute(parent, terraformAttribute, value.value, value);
+            return new TerraformBooleanListAttribute(parent, terraformAttribute, value.value, { nested: value });
         }
     }
 

@@ -1,8 +1,8 @@
-import { TerraformAttribute } from "./terraform-attribute";
+import { TerraformAttribute, TerraformAttributeOptions } from "./terraform-attribute";
 import { ITerraformAddressable } from "./terraform-addressable";
 
 export abstract class TerraformObjectAttribute extends TerraformAttribute {
-    public constructor(parent: ITerraformAddressable, terraformAttribute: string, value?: any, nestedAttribute?: TerraformAttribute) {
-        super(parent, terraformAttribute, value, nestedAttribute);
+    public constructor(parent: ITerraformAddressable, terraformAttribute: string, value?: any, options?: TerraformAttributeOptions) {
+        super(parent, terraformAttribute, value, options);
     }
 }

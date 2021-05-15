@@ -1,16 +1,21 @@
 import { TerraformSetAttribute } from "./terraform-set-attribute";
-import { TerraformAttribute } from "./terraform-attribute";
+import { TerraformAttributeOptions } from "./terraform-attribute";
 import { listMapper, booleanToTerraform } from "cdktf";
 import { TerraformBoolean } from "./terraform-boolean-attribute";
 import { ITerraformAddressable } from "./terraform-addressable";
+import { TerraformBooleanListAttribute } from "./terraform-boolean-list-attribute";
 
 export class TerraformBooleanSetAttribute extends TerraformSetAttribute {
-    public constructor(parent: ITerraformAddressable, terraformAttribute: string, value?: TerraformBoolean[] /* Set<T> isn't supported by jsii */, nestedAttribute?: TerraformAttribute) {
-        super(parent, terraformAttribute, value, nestedAttribute);
+    public constructor(parent: ITerraformAddressable, terraformAttribute: string, value?: TerraformBoolean[] /* Set<T> isn't supported by jsii */, options?: TerraformAttributeOptions) {
+        super(parent, terraformAttribute, value, options);
     }
 
     public get value(): TerraformBoolean[] /* Set<T> isn't supported by jsii */ | undefined {
         return this.realValue;
+    }
+
+    public toList(): TerraformBooleanListAttribute {
+        return new TerraformBooleanListAttribute(this.parent, this.terraformAttribute, this.value, { nested: this.nested, operation: fqn => `tolist(${fqn})` });
     }
 
     public static Create(parent: ITerraformAddressable, terraformAttribute: string, value: TerraformBooleanSet) {
@@ -21,7 +26,7 @@ export class TerraformBooleanSetAttribute extends TerraformSetAttribute {
             return value;
         }
         else {
-            return new TerraformBooleanSetAttribute(parent, terraformAttribute, value.value, value);
+            return new TerraformBooleanSetAttribute(parent, terraformAttribute, value.value, { nested: value });
         }
     }
 

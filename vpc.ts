@@ -12,6 +12,7 @@ import { IamRole } from "./modified_gen/iam-role";
 import { IamRolePolicy } from "./modified_gen/iam-role-policy";
 import { FlowLog } from "./modified_gen/flow-log";
 import { TerraformOutputModified } from "./tf_attributes/terraform-output-modified";
+import { Alb } from "./modified_gen/alb";
 
 export interface VpcConstructConfig {
     name: string;
@@ -218,6 +219,20 @@ export class VpcConstruct extends Construct {
 
         new TerraformOutputModified(this, 'id', {
             value: vpc.id
+        });
+
+        const alb = new Alb(this, 'alb');
+
+        new TerraformOutputModified(this, 'alb_subnets', {
+            value: alb.subnets
+        });
+
+        new TerraformOutputModified(this, 'alb_subnets_list', {
+            value: alb.subnets.toList()
+        });
+
+        new TerraformOutputModified(this, 'alb_subnets_list_elm', {
+            value: alb.subnets.toList().get(0)
         });
 
         //TODO figure out how to make this work. Probably by having runtime mapper know about terraform attributes

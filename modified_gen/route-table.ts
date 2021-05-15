@@ -6,7 +6,7 @@ import * as cdktf from 'cdktf';
 import { TerraformStringAttribute, TerraformString } from '../tf_attributes/terraform-string-attribute';
 import { TerraformStringListAttribute, TerraformStringList } from '../tf_attributes/terraform-string-list-attribute';
 import { TerraformListAttribute } from '../tf_attributes/terraform-list-attribute';
-import { TerraformAttribute } from '../tf_attributes/terraform-attribute';
+import { TerraformAttributeOptions } from '../tf_attributes/terraform-attribute';
 import { TerraformObjectAttribute } from '../tf_attributes/terraform-object-attribute';
 import { listMapper } from 'cdktf';
 import { TerraformStringMap, TerraformStringMapAttribute } from '../tf_attributes/terraform-string-map-attribute';
@@ -37,8 +37,8 @@ export interface RouteTableRoute {
 }
 
 export class TerraformRouteTableRouteAttribute extends TerraformObjectAttribute {
-  public constructor(parent: ITerraformAddressable, terraformAttribute: string, value?: RouteTableRoute, nestedAttribute?: TerraformAttribute) {
-    super(parent, terraformAttribute, value, nestedAttribute);
+  public constructor(parent: ITerraformAddressable, terraformAttribute: string, value?: RouteTableRoute, options?: TerraformAttributeOptions) {
+    super(parent, terraformAttribute, value, options);
   }
 
   // I don't think we need to expose this since can get at everything in it
@@ -54,7 +54,7 @@ export class TerraformRouteTableRouteAttribute extends TerraformObjectAttribute 
         return value;
     }
     else {
-        return new TerraformRouteTableRouteAttribute(parent, terraformAttribute, value.value, value);
+        return new TerraformRouteTableRouteAttribute(parent, terraformAttribute, value.value, { nested: value });
     }
   }
 
@@ -95,8 +95,8 @@ function routeTableRouteToTerraform(struct?: RouteTableRoute): any {
 }
 
 export class TerraformRouteTableRouteListAttribute extends TerraformListAttribute {
-  public constructor(parent: ITerraformAddressable, terraformAttribute: string, value?: TerraformRouteTableRoute[], nestedAttribute?: TerraformAttribute) {
-    super(parent, terraformAttribute, value, nestedAttribute);
+  public constructor(parent: ITerraformAddressable, terraformAttribute: string, value?: TerraformRouteTableRoute[], options?: TerraformAttributeOptions) {
+    super(parent, terraformAttribute, value, options);
   }
 
   public get value(): TerraformRouteTableRoute[] | undefined {
@@ -115,7 +115,7 @@ export class TerraformRouteTableRouteListAttribute extends TerraformListAttribut
         return value;
     }
     else {
-        return new TerraformRouteTableRouteListAttribute(parent, terraformAttribute, value.value, value);
+        return new TerraformRouteTableRouteListAttribute(parent, terraformAttribute, value.value, { nested: value });
     }
   }
 

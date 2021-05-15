@@ -1,10 +1,10 @@
-import { TerraformAttribute } from "./terraform-attribute";
+import { TerraformAttribute, TerraformAttributeOptions } from "./terraform-attribute";
 import { booleanToTerraform } from "cdktf";
 import { ITerraformAddressable } from "./terraform-addressable";
 
 export class TerraformBooleanAttribute extends TerraformAttribute {
-    public constructor(parent: ITerraformAddressable, terraformAttribute: string, value?: boolean, nestedAttribute?: TerraformAttribute) {
-        super(parent, terraformAttribute, value, nestedAttribute);
+    public constructor(parent: ITerraformAddressable, terraformAttribute: string, value?: boolean, options?: TerraformAttributeOptions) {
+        super(parent, terraformAttribute, value, options);
     }
 
     public get value(): boolean | undefined {
@@ -19,7 +19,7 @@ export class TerraformBooleanAttribute extends TerraformAttribute {
             return value;
         }
         else {
-            return new TerraformBooleanAttribute(parent, terraformAttribute, value.value, value);
+            return new TerraformBooleanAttribute(parent, terraformAttribute, value.value, { nested: value });
         }
     }
 

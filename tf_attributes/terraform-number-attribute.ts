@@ -1,10 +1,10 @@
-import { TerraformAttribute } from "./terraform-attribute";
+import { TerraformAttribute, TerraformAttributeOptions } from "./terraform-attribute";
 import { numberToTerraform } from "cdktf";
 import { ITerraformAddressable } from "./terraform-addressable";
 
 export class TerraformNumberAttribute extends TerraformAttribute {
-    public constructor(parent: ITerraformAddressable, terraformAttribute: string, value?: number, nestedAttribute?: TerraformAttribute) {
-        super(parent, terraformAttribute, value, nestedAttribute);
+    public constructor(parent: ITerraformAddressable, terraformAttribute: string, value?: number, options?: TerraformAttributeOptions) {
+        super(parent, terraformAttribute, value, options);
     }
 
     public get value(): number | undefined {
@@ -19,7 +19,7 @@ export class TerraformNumberAttribute extends TerraformAttribute {
             return value;
         }
         else {
-            return new TerraformNumberAttribute(parent, terraformAttribute, value.value, value);
+            return new TerraformNumberAttribute(parent, terraformAttribute, value.value, { nested: value });
         }
     }
 

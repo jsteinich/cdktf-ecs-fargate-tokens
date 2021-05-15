@@ -1,16 +1,21 @@
 import { TerraformSetAttribute } from "./terraform-set-attribute";
-import { TerraformAttribute } from "./terraform-attribute";
+import { TerraformAttributeOptions } from "./terraform-attribute";
 import { listMapper, numberToTerraform } from "cdktf";
 import { TerraformNumber } from "./terraform-number-attribute";
 import { ITerraformAddressable } from "./terraform-addressable";
+import { TerraformNumberListAttribute } from "./terraform-number-list-attribute";
 
 export class TerraformNumberSetAttribute extends TerraformSetAttribute {
-    public constructor(parent: ITerraformAddressable, terraformAttribute: string, value?: TerraformNumber[] /* Set<T> isn't supported by jsii */, nestedAttribute?: TerraformAttribute) {
-        super(parent, terraformAttribute, value, nestedAttribute);
+    public constructor(parent: ITerraformAddressable, terraformAttribute: string, value?: TerraformNumber[] /* Set<T> isn't supported by jsii */, options?: TerraformAttributeOptions) {
+        super(parent, terraformAttribute, value, options);
     }
 
     public get value(): TerraformNumber[] /* Set<T> isn't supported by jsii */ | undefined {
         return this.realValue;
+    }
+
+    public toList(): TerraformNumberListAttribute {
+        return new TerraformNumberListAttribute(this.parent, this.terraformAttribute, this.value, { nested: this.nested, operation: fqn => `tolist(${fqn})` });
     }
 
     public static Create(parent: ITerraformAddressable, terraformAttribute: string, value: TerraformNumberSet) {
@@ -21,7 +26,7 @@ export class TerraformNumberSetAttribute extends TerraformSetAttribute {
             return value;
         }
         else {
-            return new TerraformNumberSetAttribute(parent, terraformAttribute, value.value, value);
+            return new TerraformNumberSetAttribute(parent, terraformAttribute, value.value, { nested: value });
         }
     }
 
