@@ -1,9 +1,9 @@
 import { TerraformAttribute } from "./terraform-attribute";
-import { TerraformInterpolable } from "./terraform-interpolable";
 import { stringToTerraform } from "cdktf";
+import { ITerraformAddressable } from "./terraform-addressable";
 
 export class TerraformStringAttribute extends TerraformAttribute {
-    public constructor(parent: TerraformInterpolable, terraformAttribute: string, value?: string, nestedAttribute?: TerraformAttribute) {
+    public constructor(parent: ITerraformAddressable, terraformAttribute: string, value?: string, nestedAttribute?: TerraformAttribute) {
         super(parent, terraformAttribute, value, nestedAttribute);
     }
 
@@ -11,7 +11,7 @@ export class TerraformStringAttribute extends TerraformAttribute {
         return this.realValue;
     }
 
-    public static Create(parent: TerraformInterpolable, terraformAttribute: string, value: TerraformString) {
+    public static Create(parent: ITerraformAddressable, terraformAttribute: string, value: TerraformString) {
         if (typeof(value) === 'string') {
             return new TerraformStringAttribute(parent, terraformAttribute, value);
         }

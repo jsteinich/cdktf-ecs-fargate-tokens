@@ -1,7 +1,7 @@
-import { TerraformInterpolable } from "./terraform-interpolable";
+import { ITerraformAddressable } from "./terraform-addressable";
 
-export abstract class TerraformAttribute {
-    public constructor(protected readonly parent: TerraformInterpolable, protected readonly terraformAttribute: string, protected realValue?: any, protected nested?: TerraformAttribute) {
+export abstract class TerraformAttribute implements ITerraformAddressable {
+    public constructor(protected readonly parent: ITerraformAddressable, protected readonly terraformAttribute: string, protected realValue?: any, protected nested?: TerraformAttribute) {
 
     }
 
@@ -13,7 +13,7 @@ export abstract class TerraformAttribute {
     public toTerraform(): any {
         if (this.nested) {
             //only go up one level to maintain terraform dependencies
-            return this.nested.parent.interpolationForAttribute(this.terraformAttribute);
+            return `\${${this.nested.parent.fqn}.${this.nested.terraformAttribute}}`;
         }
         else {
             return this.valueToTerraform();
@@ -25,7 +25,7 @@ export abstract class TerraformAttribute {
     }
 
     public get terraformReference(): string {
-        return this.parent.interpolationForAttribute(this.terraformAttribute);
+        return `\${${this.parent.fqn}.${this.terraformAttribute}}`;
     }
 
     protected abstract valueToTerraform(): any;

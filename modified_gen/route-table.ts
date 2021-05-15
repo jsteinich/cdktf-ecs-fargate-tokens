@@ -6,11 +6,11 @@ import * as cdktf from 'cdktf';
 import { TerraformStringAttribute, TerraformString } from '../tf_attributes/terraform-string-attribute';
 import { TerraformStringListAttribute, TerraformStringList } from '../tf_attributes/terraform-string-list-attribute';
 import { TerraformListAttribute } from '../tf_attributes/terraform-list-attribute';
-import { TerraformInterpolable } from '../tf_attributes/terraform-interpolable';
 import { TerraformAttribute } from '../tf_attributes/terraform-attribute';
 import { TerraformObjectAttribute } from '../tf_attributes/terraform-object-attribute';
 import { listMapper } from 'cdktf';
 import { TerraformStringMap, TerraformStringMapAttribute } from '../tf_attributes/terraform-string-map-attribute';
+import { ITerraformAddressable } from '../tf_attributes/terraform-addressable';
 
 // Configuration
 
@@ -37,7 +37,7 @@ export interface RouteTableRoute {
 }
 
 export class TerraformRouteTableRouteAttribute extends TerraformObjectAttribute {
-  public constructor(parent: TerraformInterpolable, terraformAttribute: string, value?: RouteTableRoute, nestedAttribute?: TerraformAttribute) {
+  public constructor(parent: ITerraformAddressable, terraformAttribute: string, value?: RouteTableRoute, nestedAttribute?: TerraformAttribute) {
     super(parent, terraformAttribute, value, nestedAttribute);
   }
 
@@ -46,7 +46,7 @@ export class TerraformRouteTableRouteAttribute extends TerraformObjectAttribute 
     return this.realValue;
   }
 
-  public static Create(parent: TerraformInterpolable, terraformAttribute: string, value: TerraformRouteTableRoute) {
+  public static Create(parent: ITerraformAddressable, terraformAttribute: string, value: TerraformRouteTableRoute) {
     if (!(value instanceof TerraformRouteTableRouteAttribute)) {
         return new TerraformRouteTableRouteAttribute(parent, terraformAttribute, value);
     }
@@ -95,7 +95,7 @@ function routeTableRouteToTerraform(struct?: RouteTableRoute): any {
 }
 
 export class TerraformRouteTableRouteListAttribute extends TerraformListAttribute {
-  public constructor(parent: TerraformInterpolable, terraformAttribute: string, value?: TerraformRouteTableRoute[], nestedAttribute?: TerraformAttribute) {
+  public constructor(parent: ITerraformAddressable, terraformAttribute: string, value?: TerraformRouteTableRoute[], nestedAttribute?: TerraformAttribute) {
     super(parent, terraformAttribute, value, nestedAttribute);
   }
 
@@ -104,10 +104,10 @@ export class TerraformRouteTableRouteListAttribute extends TerraformListAttribut
   }
 
   public get(index: number): TerraformRouteTableRouteAttribute {
-    return new TerraformRouteTableRouteAttribute(this, `[${index}]`);
+    return new TerraformRouteTableRouteAttribute(this, index.toString());
 }
 
-  public static Create(parent: TerraformInterpolable, terraformAttribute: string, value: TerraformRouteTableRouteList) {
+  public static Create(parent: ITerraformAddressable, terraformAttribute: string, value: TerraformRouteTableRouteList) {
     if (!(value instanceof TerraformRouteTableRouteListAttribute)) {
         return new TerraformRouteTableRouteListAttribute(parent, terraformAttribute, value);
     }

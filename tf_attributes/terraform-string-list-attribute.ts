@@ -1,11 +1,11 @@
 import { TerraformListAttribute } from "./terraform-list-attribute";
-import { TerraformInterpolable } from "./terraform-interpolable";
 import { TerraformAttribute } from "./terraform-attribute";
 import { listMapper, stringToTerraform } from "cdktf";
 import { TerraformString, TerraformStringAttribute } from "./terraform-string-attribute";
+import { ITerraformAddressable } from "./terraform-addressable";
 
 export class TerraformStringListAttribute extends TerraformListAttribute {
-    public constructor(parent: TerraformInterpolable, terraformAttribute: string, value?: TerraformString[], nestedAttribute?: TerraformAttribute) {
+    public constructor(parent: ITerraformAddressable, terraformAttribute: string, value?: TerraformString[], nestedAttribute?: TerraformAttribute) {
         super(parent, terraformAttribute, value, nestedAttribute);
     }
 
@@ -14,10 +14,10 @@ export class TerraformStringListAttribute extends TerraformListAttribute {
     }
 
     public get(index: number): TerraformStringAttribute {
-        return new TerraformStringAttribute(this, `[${index}]`);
+        return new TerraformStringAttribute(this, index.toString());
     }
 
-    public static Create(parent: TerraformInterpolable, terraformAttribute: string, value: TerraformStringList) {
+    public static Create(parent: ITerraformAddressable, terraformAttribute: string, value: TerraformStringList) {
         if (!(value instanceof TerraformStringListAttribute)) {
             return new TerraformStringListAttribute(parent, terraformAttribute, value);
         }

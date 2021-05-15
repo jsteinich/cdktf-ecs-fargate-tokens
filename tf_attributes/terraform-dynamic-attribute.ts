@@ -1,9 +1,9 @@
 import { TerraformAttribute } from "./terraform-attribute";
-import { TerraformInterpolable } from "./terraform-interpolable";
 import { hashMapper, anyToTerraform } from "cdktf";
+import { ITerraformAddressable } from "./terraform-addressable";
 
 export class TerraformDynamicAttribute extends TerraformAttribute {
-    public constructor(parent: TerraformInterpolable, terraformAttribute: string, value?: { [key: string]: any }, nestedAttribute?: TerraformAttribute) {
+    public constructor(parent: ITerraformAddressable, terraformAttribute: string, value?: { [key: string]: any }, nestedAttribute?: TerraformAttribute) {
         super(parent, terraformAttribute, value, nestedAttribute);
     }
 
@@ -11,7 +11,7 @@ export class TerraformDynamicAttribute extends TerraformAttribute {
         return this.realValue;
     }
 
-    public static Create(parent: TerraformInterpolable, terraformAttribute: string, value: TerraformDynamic) {
+    public static Create(parent: ITerraformAddressable, terraformAttribute: string, value: TerraformDynamic) {
         if (!(value instanceof TerraformDynamicAttribute)) {
             return new TerraformDynamicAttribute(parent, terraformAttribute, value);
         }

@@ -1,9 +1,9 @@
 import { TerraformAttribute } from "./terraform-attribute";
-import { TerraformInterpolable } from "./terraform-interpolable";
 import { booleanToTerraform } from "cdktf";
+import { ITerraformAddressable } from "./terraform-addressable";
 
 export class TerraformBooleanAttribute extends TerraformAttribute {
-    public constructor(parent: TerraformInterpolable, terraformAttribute: string, value?: boolean, nestedAttribute?: TerraformAttribute) {
+    public constructor(parent: ITerraformAddressable, terraformAttribute: string, value?: boolean, nestedAttribute?: TerraformAttribute) {
         super(parent, terraformAttribute, value, nestedAttribute);
     }
 
@@ -11,7 +11,7 @@ export class TerraformBooleanAttribute extends TerraformAttribute {
         return this.realValue;
     }
 
-    public static Create(parent: TerraformInterpolable, terraformAttribute: string, value: TerraformBoolean) {
+    public static Create(parent: ITerraformAddressable, terraformAttribute: string, value: TerraformBoolean) {
         if (typeof(value) === 'boolean') {
             return new TerraformBooleanAttribute(parent, terraformAttribute, value);
         }

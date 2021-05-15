@@ -1,11 +1,11 @@
 import { TerraformAttribute } from "./terraform-attribute";
-import { TerraformInterpolable } from "./terraform-interpolable";
 import { hashMapper, numberToTerraform } from "cdktf";
 import { TerraformMapAttribute } from "./terraform-map-attribute";
 import { TerraformNumber, TerraformNumberAttribute } from "./terraform-number-attribute";
+import { ITerraformAddressable } from "./terraform-addressable";
 
 export class TerraformNumberMapAttribute extends TerraformMapAttribute {
-    public constructor(parent: TerraformInterpolable, terraformAttribute: string, value?: { [key: string]: TerraformNumber }, nestedAttribute?: TerraformAttribute) {
+    public constructor(parent: ITerraformAddressable, terraformAttribute: string, value?: { [key: string]: TerraformNumber }, nestedAttribute?: TerraformAttribute) {
         super(parent, terraformAttribute, value, nestedAttribute);
     }
 
@@ -17,7 +17,7 @@ export class TerraformNumberMapAttribute extends TerraformMapAttribute {
         return new TerraformNumberAttribute(this, `${key}`);
     }
 
-    public static Create(parent: TerraformInterpolable, terraformAttribute: string, value: TerraformNumberMap) {
+    public static Create(parent: ITerraformAddressable, terraformAttribute: string, value: TerraformNumberMap) {
         if (!(value instanceof TerraformNumberMapAttribute)) {
             return new TerraformNumberMapAttribute(parent, terraformAttribute, value);
         }

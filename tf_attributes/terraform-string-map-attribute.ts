@@ -1,11 +1,11 @@
 import { TerraformAttribute } from "./terraform-attribute";
-import { TerraformInterpolable } from "./terraform-interpolable";
 import { hashMapper, stringToTerraform } from "cdktf";
 import { TerraformMapAttribute } from "./terraform-map-attribute";
 import { TerraformString, TerraformStringAttribute } from "./terraform-string-attribute";
+import { ITerraformAddressable } from "./terraform-addressable";
 
 export class TerraformStringMapAttribute extends TerraformMapAttribute {
-    public constructor(parent: TerraformInterpolable, terraformAttribute: string, value?: { [key: string]: TerraformString }, nestedAttribute?: TerraformAttribute) {
+    public constructor(parent: ITerraformAddressable, terraformAttribute: string, value?: { [key: string]: TerraformString }, nestedAttribute?: TerraformAttribute) {
         super(parent, terraformAttribute, value, nestedAttribute);
     }
 
@@ -17,7 +17,7 @@ export class TerraformStringMapAttribute extends TerraformMapAttribute {
         return new TerraformStringAttribute(this, `${key}`);
     }
 
-    public static Create(parent: TerraformInterpolable, terraformAttribute: string, value: TerraformStringMap) {
+    public static Create(parent: ITerraformAddressable, terraformAttribute: string, value: TerraformStringMap) {
         if (!(value instanceof TerraformStringMapAttribute)) {
             return new TerraformStringMapAttribute(parent, terraformAttribute, value);
         }

@@ -1,11 +1,11 @@
 import { TerraformAttribute } from "./terraform-attribute";
-import { TerraformInterpolable } from "./terraform-interpolable";
 import { hashMapper, booleanToTerraform } from "cdktf";
 import { TerraformMapAttribute } from "./terraform-map-attribute";
 import { TerraformBoolean, TerraformBooleanAttribute } from "./terraform-boolean-attribute";
+import { ITerraformAddressable } from "./terraform-addressable";
 
 export class TerraformBooleanMapAttribute extends TerraformMapAttribute {
-    public constructor(parent: TerraformInterpolable, terraformAttribute: string, value?: { [key: string]: TerraformBoolean }, nestedAttribute?: TerraformAttribute) {
+    public constructor(parent: ITerraformAddressable, terraformAttribute: string, value?: { [key: string]: TerraformBoolean }, nestedAttribute?: TerraformAttribute) {
         super(parent, terraformAttribute, value, nestedAttribute);
     }
 
@@ -17,7 +17,7 @@ export class TerraformBooleanMapAttribute extends TerraformMapAttribute {
         return new TerraformBooleanAttribute(this, `${key}`);
     }
 
-    public static Create(parent: TerraformInterpolable, terraformAttribute: string, value: TerraformBooleanMap) {
+    public static Create(parent: ITerraformAddressable, terraformAttribute: string, value: TerraformBooleanMap) {
         if (!(value instanceof TerraformBooleanMapAttribute)) {
             return new TerraformBooleanMapAttribute(parent, terraformAttribute, value);
         }
